@@ -2,6 +2,7 @@ package com.example.instagramclone;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -68,6 +69,9 @@ public class SingUp extends AppCompatActivity {
                     public void done(ParseUser user, ParseException e) {
                         if(user !=null && e==null){
                             FancyToast.makeText(SingUp.this,user.get("username")+" is Logged in successfully",FancyToast.LENGTH_LONG,FancyToast.SUCCESS,true).show();
+
+                            Intent intent = new Intent(SingUp.this,WelcomeActivity.class);
+                            startActivity(intent);
 
                         }else {
                             FancyToast.makeText(SingUp.this,e.getMessage(),FancyToast.LENGTH_LONG,FancyToast.ERROR,true).show();
