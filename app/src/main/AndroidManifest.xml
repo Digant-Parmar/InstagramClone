@@ -11,7 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".LoginActivity"></activity>
-        <activity android:name=".SocialMediaActivity" />
+        <activity android:name=".SocialMediaActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <activity android:name=".SingUp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
