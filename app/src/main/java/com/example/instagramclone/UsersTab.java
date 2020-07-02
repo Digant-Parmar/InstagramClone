@@ -1,9 +1,11 @@
 package com.example.instagramclone;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -18,16 +21,19 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import libs.mjn.prettydialog.PrettyDialog;
+import libs.mjn.prettydialog.PrettyDialogCallback;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link UsersTab#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class UsersTab extends Fragment {
+public class UsersTab extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
 
     private ListView listView;
 
-    private ArrayList arrayList;
+    private ArrayList<String > arrayList;
 
     private ArrayAdapter arrayAdapter;
 
@@ -80,6 +86,8 @@ public class UsersTab extends Fragment {
         listView = view.findViewById(R.id.listView);
         arrayList = new ArrayList();
         arrayAdapter = new ArrayAdapter(getContext(),android.R.layout.simple_list_item_1,arrayList);
+        listView.setOnItemClickListener(UsersTab.this);
+        listView.setOnItemLongClickListener(UsersTab.this);
         final TextView txtLoading = view.findViewById(R.id.txtLoading);
 
         final ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
@@ -105,5 +113,53 @@ public class UsersTab extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        Intent intent = new Intent(getContext(),UsersPost.class);
+        intent.putExtra("username",arrayList.get(position));
+        startActivity(intent);
+
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+        ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
+        parseQuery.whereEqualTo("username",arrayList.get(position));
+        parseQuery.getFirstInBackground(new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser object, ParseException e) {
+                if(object!=null && e==null){
+                  //  FancyToast.makeText(getContext(),object.get("profileProfession")+"", Toast.LENGTH_SHORT)
+                    final PrettyDialog prettyDialog = new PrettyDialog(getContext());
+
+                    prettyDialog.setTitle(object.getUsername()+",s Info")
+                            .setMessage(object.get("profileBio")+ "\n"
+                                    + object.get("profileProfession")+ "\n"
+                                    +object.get("profileHobbies")+"\n"
+                                    +object.get("profileSport"))
+                                    .setIcon(R.drawable.person)
+                            .addButton(
+                                    "OK",
+                                    R.color.pdlg_color_white,  //text Color
+                                    R.color.pdlg_color_green,  //background
+                                    new PrettyDialogCallback() {
+                                        @Override
+                                        public void onClick() {
+                                            prettyDialog.dismiss();
+                                        }
+                                    }
+
+                            ).show();
+
+
+                }
+            }
+        });
+
+        return true;
     }
 }
